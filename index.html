@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Timer</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            overflow: hidden;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .timer-container {
+            width: 50%;
+            height: 400px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 60px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .timer-title {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .timer-display {
+            font-size: 15rem;
+            font-weight: 650;
+            margin-bottom: 30px;
+            font-family: 'Segoe UI', 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            letter-spacing: 0.05em;
+            line-height: 0.9;
+        }
+
+        .timer-status {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: rgba(76, 175, 80, 0.7);
+        }
+
+        .btn-danger {
+            background: rgba(244, 67, 54, 0.7);
+        }
+
+        .btn-secondary {
+            background: rgba(33, 150, 243, 0.7);
+        }
+
+        .cycle-info {
+            font-size: 1.2rem;
+            margin-top: 20px;
+            opacity: 0.8;
+        }
+
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: -50%;
+            width: 50%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(15px);
+            padding: 30px;
+            border-radius: 20px 0 0 20px;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-right: none;
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+
+        .settings-panel.open {
+            right: 0;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .settings-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .settings-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .settings-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .setting-group {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .setting-group h3 {
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .setting-item {
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .setting-item label {
+            font-size: 1rem;
+            margin-right: 10px;
+        }
+
+        .setting-item input {
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            width: 80px;
+        }
+
+        .setting-item input[type="file"] {
+            width: auto;
+        }
+
+        .setting-item input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .work-mode {
+            color: var(--work-color, #4CAF50);
+        }
+
+        .break-mode {
+            color: var(--break-color, #FF9800);
+        }
+
+        /* Theme templates */
+        .theme-templates {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .theme-item {
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .theme-item:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .theme-item.active {
+            border-color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .theme-preview {
+            width: 70px;
+            height: 70px;
+            border-radius: 15px;
+            margin: 0 auto 10px;
+            border: 3px solid rgba(255, 255, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .theme-item:hover .theme-preview {
+            border-color: rgba(255, 255, 255, 0.7);
+            transform: scale(1.05);
+        }
+
+        .theme-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .theme-name {
+            font-size: 0.9rem;
+            color: white;
+            font-weight: 500;
+        }
+
+        /* File upload styling */
+        .file-upload-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .file-upload-wrapper input[type="file"] {
+            position: relative;
+            cursor: pointer;
+            width: 100%;
+            opacity: 0;
+            margin: -10px;
+            margin-bottom:-50px ;
+        }
+
+        .file-upload-button {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            width: 100%;
+            position: relative;
+        }
+
+        .file-upload-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Color picker styling */
+        .setting-item input[type="color"] {
+            width: 50px;
+            height: 35px;
+            padding: 0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: none;
+        }
+
+        /* Color templates */
+        .color-templates {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .color-item {
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            padding: 8px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+        }
+
+        .color-item:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .color-item.active {
+            border-color: rgba(255, 255, 255, 0.9);
+            transform: translateY(-1px);
+        }
+
+        .color-preview {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            margin: 0 auto 8px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .color-item:hover .color-preview {
+            border-color: rgba(255, 255, 255, 0.7);
+            transform: scale(1.05);
+        }
+
+        .color-name {
+            font-size: 0.8rem;
+            color: white;
+            font-weight: 500;
+        }
+
+        .progress-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+        }
+
+        .progress-ring svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .progress-ring circle {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.2);
+            stroke-width: 4;
+        }
+
+        .progress-ring .progress {
+            stroke: #4CAF50;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s linear;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        @media (max-width: 768px) {
+            .timer-display {
+                font-size: 5.5rem;
+            }
+
+            .timer-container {
+                padding: 40px 20px;
+                margin: 20px;
+            }
+
+            .settings-content {
+                grid-template-columns: 1fr;
+                padding: 0 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-container">
+        <div class="timer-container">
+            <div class="progress-ring">
+                <svg>
+                    <circle cx="150" cy="150" r="140"></circle>
+                    <circle cx="150" cy="150" r="140" class="progress"></circle>
+                </svg>
+            </div>
+
+            <div class="timer-display" id="timerDisplay">25:00</div>
+
+        </div>
+
+        <div class="timer-status" id="timerStatus">Ish vaqti - Fokus qiling!</div>
+        <div class="control-buttons">
+            <button class="btn btn-primary" id="startBtn" onclick="toggleTimer()">Boshlash</button>
+            <button class="btn btn-danger" id="pauseBtn" onclick="pauseTimer()" style="display: none;">Pauza</button>
+            <button class="btn btn-secondary" onclick="resetTimer()">Qayta boshlash</button>
+            <button class="btn" onclick="skipSession()">O'tkazib yuborish</button>
+        </div>
+        <div class="cycle-info" id="cycleInfo">Sikl: 1 | Jami: 0 soat</div>
+
+    </div>
+
+    <button class="settings-toggle" onclick="toggleSettings()">⚙️</button>
+
+    <div class="settings-panel" id="settingsPanel">
+        <button class="close-button" onclick="toggleSettings()">×</button>
+        <div class="settings-content">
+            <div class="setting-group">
+                <h3>⏱️ Vaqt sozlamalari</h3>
+                <div class="setting-item">
+                    <label>Ish vaqti (daqiqa):</label>
+                    <input type="number" id="workTime" value="25" min="1" max="60">
+                </div>
+                <div class="setting-item">
+                    <label>Qisqa tanaffus (daqiqa):</label>
+                    <input type="number" id="shortBreak" value="10" min="1" max="30">
+                </div>
+                <div class="setting-item">
+                    <label>Uzun tanaffus (daqiqa):</label>
+                    <input type="number" id="longBreak" value="15" min="1" max="60">
+                </div>
+                <div class="setting-item">
+                    <label>Uzun tanaffus har necha sikldan:</label>
+                    <input type="number" id="longBreakInterval" value="4" min="2" max="10">
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3>🎨 Orqa fon sozlamalari</h3>
+                <div class="setting-item">
+                    <label>Orqa fon rasmi:</label>
+                    <div class="file-upload-wrapper">
+                        <span class="file-upload-button"> <input type="file"
+                                id="backgroundImage" value="Rasm tanlang" accept="image/*"
+                                onchange="changeBackground()">
+                               Orqa fon faylini tanlang</span>
+
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <button class="btn" onclick="resetBackground()">Standart fonni qaytarish</button>
+                </div>
+                <div class="setting-item">
+                    <label>Orqa fon rangini tanlang:</label>
+                    <input type="color" id="colorPicker" onchange="changeBackgroundColor()" value="#667eea">
+                </div>
+                <div class="color-templates" id="colorTemplates">
+                    <!-- Color options will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3>🎨 Tema Tanlagichlar</h3>
+                <div class="theme-templates" id="themeTemplates">
+                    <!-- Themes will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3>🔊 Ovoz sozlamalari</h3>
+                <div class="setting-item">
+                    <label>Ovozli bildirishnomalar:</label>
+                    <input type="checkbox" id="soundEnabled" checked>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>

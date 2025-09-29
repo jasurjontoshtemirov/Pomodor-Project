@@ -1,0 +1,22 @@
+{
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  },
+  "name": "pomodoro",
+  "version": "1.0.0",
+  "description": "Hello everyone hi",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jasurjontoshtemirov/Pomodor-Project.git"
+  },
+  "author": "Jasurjon Toshtemirov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jasurjontoshtemirov/Pomodor-Project/issues"
+  },
+  "homepage": "https://github.com/jasurjontoshtemirov/Pomodor-Project#readme"
+}
